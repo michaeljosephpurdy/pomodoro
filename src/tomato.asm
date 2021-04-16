@@ -22,6 +22,7 @@ TomatoSprite:
   dw `22220000
 
 SECTION "Tomato_init", ROM0
+Tomato_oam1 EQU $FE00
 Tomato_init::
   ld a, 20
   ld [TomatoX], a
@@ -46,7 +47,7 @@ Tomato_draw::
   jr nz, .loop ; if b isn't 0, keep working
 .setup_oam
   ; top left
-  ld hl, $FE04
+  ld hl, Tomato_oam1
   ld a, [TomatoX]
   ld [hli], a
   ld a, [TomatoY]
