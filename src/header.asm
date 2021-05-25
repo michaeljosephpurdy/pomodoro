@@ -1,6 +1,5 @@
-; cartridge-header
 ; https://gbdev.io/pandocs/#the-cartridge-header
-SECTION "rom", ROM0
+SECTION "header", ROM0[$0104]
 
 ; HEADER
 ; $0104 - $0133: The Nintendo Logo.
