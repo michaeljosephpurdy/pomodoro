@@ -14,3 +14,6 @@ assemble:
 
 clean:
 	rm -rf ./build/*
+
+2bpp:
+	rgbgfx assets/tomato.png -f -o include/tomato.2bpp
