@@ -5,7 +5,7 @@ assemble:
 	rgbasm -E -o ./build/interrupts.o ./src/interrupts.asm
 	rgbasm -E -o ./build/header.o ./src/header.asm
 	rgbasm -E -o ./build/counting.o ./src/counting.asm
-	rgbasm -E -o ./build/tomato.o ./src/tomato.asm
+	rgbasm -E -o ./build/tomato.o ./src/tomato.asm -i include/
 	rgbasm -E -o ./build/screen.o ./src/screen.asm
 	rgbasm -E -o ./build/input.o ./src/input.asm
 	rgbasm -E -o ./build/text.o ./src/text.asm -i include/

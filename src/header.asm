@@ -1,3 +1,9 @@
+; $0100-0103 is reserved for entry point
+; https://gbdev.io/pandocs/#_0100-0103-entry-point
+SECTION "Entry Point", ROM0[$0100]
+	di
+	jp	Main
+
 ; https://gbdev.io/pandocs/#the-cartridge-header
 SECTION "header", ROM0[$0104]
 

@@ -1,5 +1,5 @@
-SECTION "interrupts_init", ROM0
-Interrupts_init::
+SECTION "InterruptsInit", ROM0
+InterruptsInit::
 	; https://gbdev.io/pandocs/Interrupts.html#ffff---ie---interrupt-enable-rw
 	; Interrupt flag
 	; Bit 0: VBlank
@@ -14,16 +14,22 @@ Interrupts_init::
 	reti ; enable interrupts
 
 SECTION "interrupts_vblank", ROM0[$0040]
-	jp VBlank_handler
+	jp VBlankHandler
 
 SECTION "interrupts_vblankHandler", ROM0
-VBlank_handler:
+VBlankHandler:
   push af
   push bc
   push de
   push hl
+.setpalettes
+ 	ld a, %11100100	
+ 	ld [$FF47], a ; $FF47 - Background palette 
+ 	ld [$FF48], a ; $FF48 - Object palette 
 	ld  a, HIGH(wShadowOAM)
   call hOAMDMA
+  call TextUpdate
+  call TextDraw
   pop hl
   pop de
   pop bc
@@ -34,21 +40,15 @@ SECTION "interrupts_lcd", ROM0[$0048]
   ret
   
 SECTION "interrupts_timer", ROM0[$0050]
-  jp Timer_handler
+  jp TimerHandler
 
 SECTION "interrupts_timerHandler", ROM0
-Timer_handler:
+TimerHandler:
   push af
   push bc
   push de
   push hl
-	nop
-	nop
-	nop
-	call Counting_update
-	nop
-	nop
-	nop
+	call CountingUpdate
   pop hl
   pop de
   pop bc

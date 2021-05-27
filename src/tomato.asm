@@ -1,46 +1,35 @@
-SECTION "Tomato_wram", WRAM0
-Tomato_dataStart::
-Tomato_x: DS 1
-Tomato_y: DS 1
-Tomato_dataEnd::
+SECTION "Tomato Variables", WRAM0
+wTomato_dataStart::
+wTomato_x: DS 1
+wTomato_y: DS 1
+wTomato_dataEnd::
 
-SECTION "Tomato_rom", ROM0
+SECTION "Tomato Sprite", ROM0
 TomatoSprite:
-  DB $aa, $01, $01, $00, $80, $00, $01, $00
-  DB $80, $01, $01, $00, $80, $00, $55, $00
-  DB $aa, $01, $01, $00, $80, $00, $01, $00
-  DB $80, $01, $01, $00, $80, $00, $55, $00
-  DB $aa, $01, $01, $00, $80, $00, $01, $00
-  DB $80, $01, $01, $00, $80, $00, $55, $00
-  DB $aa, $01, $01, $00, $80, $00, $01, $00
-  DB $80, $01, $01, $00, $80, $00, $55, $00
+  INCBIN "tomato.2bpp"
 
-SECTION "Tomato_init", ROM0
-Tomato_oam1 EQU $FE00
-Tomato_oam2 EQU $FE04
-Tomato_oam3 EQU $FE08
-Tomato_oam4 EQU $FE0C
-Tomato_init::
-  ld a, 20
-  ld [Tomato_x], a
-  ld a, 40
-  ld [Tomato_y], a
+SECTION "Tomato Init", ROM0
+TomatoInit::
+  ld a, 8
+  ld [wTomato_x], a
+  ld a, 16
+  ld [wTomato_y], a
   ret
 
-SECTION "Tomato_move", ROM0
-Tomato_moveX::
-  ld a, [Tomato_x]
+SECTION "Tomato Move", ROM0
+TomatoMoveX::
+  ld a, [wTomato_x]
   inc a
-  ld [Tomato_x], a
+  ld [wTomato_x], a
   ret
-Tomato_moveY::
-  ld a, [Tomato_y]
+TomatoMoveY::
+  ld a, [wTomato_y]
   inc a
-  ld [Tomato_y], a
+  ld [wTomato_y], a
   ret
 
-SECTION "Tomato_draw", ROM0
-Tomato_draw::
+SECTION "Tomato Draw", ROM0
+TomatoDraw::
   ; we need to copy the data from ROM into VRAM
   ld hl, TomatoSprite ; label where the sprite data exists
   ; get the location _not_ the value
@@ -56,58 +45,52 @@ Tomato_draw::
   jr nz, .loop ; if b isn't 0, keep working
   ret
 
-SECTION "Tomato_update", ROM0
-Tomato_update::
-.setup_oam
-
-  ; top left
+SECTION "Tomato Update", ROM0
+TomatoUpdate::
+ 	ld a, %11100100
+ 	ld [$FF48], a ; $FF48 - Object palette 
+.topLeft
   ld hl, wShadowOAM
-  ld a, [Tomato_y]
+  ld a, [wTomato_y]
+  ld [hli], a       ; y position
+  ld a, [wTomato_x]
+  ld [hli], a       ; x position
+  xor a             ; 0 sprite
   ld [hli], a
-  ld a, [Tomato_x]
+  xor a             ; 0 palette
   ld [hli], a
-  ld a, %00000000
-  ld [hli], a
-  xor a
-  ld [hli], a
-
-  ; top right
-  ;ld hl, Tomato_oam2
+.topRight
   ld hl, wShadowOAM + 4
-  ld a, [Tomato_y]
+  ld a, [wTomato_y]
+  ld [hli], a       ; y position
+  ld a, [wTomato_x]
+  add a, 8          ; x position
   ld [hli], a
-  ld a, [Tomato_x]
-  add a, 8
+  ld a, 1           ; 1 sprite
   ld [hli], a
-  ld a, $01
-  ld [hli], a
-  xor a
+  xor a             ; 0 palette
   ld [hl], a
-
-  ; bot left 
-  ;ld hl, Tomato_oam3
+.bottomLeft
   ld hl, wShadowOAM + 8
-  ld a, [Tomato_y]
+  ld a, [wTomato_y]
   add a, 8
-  ld [hli], a
-  ld a, [Tomato_x]
-  ld [hli], a
-  ld a, $02
-  ld [hli], a
+  ld [hli], a       ; y position
+  ld a, [wTomato_x]
+  ld [hli], a       ; x position
+  ld a, 2
+  ld [hli], a       ; 2 sprite
   xor a
-  ld [hl], a
-
-  ; bot right
-  ;ld hl, Tomato_oam4
+  ld [hl], a        ; 0 palette
+.bottomRight
   ld hl, wShadowOAM + 16
-  ld a, [Tomato_y]
+  ld a, [wTomato_y]
+  add a, 8          ; y position
+  ld [hli], a
+  ld a, [wTomato_x]
   add a, 8
-  ld [hli], a
-  ld a, [Tomato_x]
-  add a, 8
-  ld [hli], a
-  ld a, $03
-  ld [hli], a
-  xor a
-  ld [hl], a
+  ld [hli], a       ; x position
+  ld a, 3
+  ld [hli], a       ; 3 sprite
+  xor 0
+  ld [hl], a        ; 0 palette
   ret

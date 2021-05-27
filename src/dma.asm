@@ -1,5 +1,10 @@
-SECTION "Dma_init", ROM0
-DMA_init::
+SECTION "Shadow OAM", WRAM0,ALIGN[8]
+wShadowOAM::
+  ds 4 * 40 ; This is the buffer we'll write sprite data to
+wShadowOAMEnd::
+
+SECTION "DMA init", ROM0
+DMAInit::
   ld a, $C1
   ld [$FF46], a
   ; DMA transfer begins, we need to wait 160 microseconds while it transfers
@@ -10,7 +15,7 @@ DMA_init::
   jr      nz, .loop
   ret
 
-SECTION "OAM DMA routine", ROM0
+SECTION "DMA routine", ROM0
 CopyDMARoutine:
   ld  hl, DMARoutine
   ld  b, DMARoutineEnd - DMARoutine ; Number of bytes to copy
@@ -32,7 +37,7 @@ DMARoutine:
   ret
 DMARoutineEnd:
 
-ShadowOAM_clear::
+ShadowOAMClear::
   ld de, wShadowOAMEnd
   ld hl, wShadowOAM
 .loop
@@ -49,8 +54,3 @@ ShadowOAM_clear::
 SECTION "OAM DMA", HRAM
 hOAMDMA::
   ds DMARoutineEnd - DMARoutine ; Reserve space to copy the routine to
-
-SECTION "Shadow OAM", WRAM0,ALIGN[8]
-wShadowOAM::
-  ds 4 * 40 ; This is the buffer we'll write sprite data to
-wShadowOAMEnd::

@@ -1,102 +1,102 @@
 SECTION "Counting_variables", WRAM0
-;Timer_ms: DS 2
-Timer_s: DS 2
-Timer_m: DS 2
-Timer_goal: DS 2
-Timer_shouldCount: DS 1
-Timer_pause: DS 1
-Timer_done: DS 1
-Time_left_m: DS 1
-Time_left_s: DS 1
+;wTimer_ms: DS 2
+wTimer_s: DS 2
+wTimer_m: DS 2
+wTimer_goal: DS 2
+wTimer_shouldCount: DS 1
+wTimer_pause: DS 1
+wTimer_done: DS 1
+wTime_left_m:: DS 1
+wTime_left_s:: DS 1
 
 SECTION "CountingInit", ROM0
-Counting_init::
+CountingInit::
 	;xor a
-	;ld [Timer_ms], a
+	;ld [wTimer_ms], a
 	xor a
-	ld [Timer_s], a
+	ld [wTimer_s], a
 	xor a
-	ld [Timer_m], a
+	ld [wTimer_m], a
 	ld a, 1
-	ld [Timer_goal], a
+	ld [wTimer_goal], a
 	ld a, 1
-	ld [Timer_shouldCount], a
-	call Counting_resume
-	call Counting_reset
+	ld [wTimer_shouldCount], a
+	call CountingResume
+	call CountingReset
 	ret
 
 SECTION "CountingToggle", ROM0
 Counting_toggle::
-	ld a, [Timer_pause]
+	ld a, [wTimer_pause]
   cp 1
 	jr z, .resume
-	call Counting_pause
+	call CountingPause
 	ret
 .resume
-	call Counting_resume
+	call CountingResume
 	ret
-Counting_resume::
+CountingResume::
 	xor a
-	ld [Timer_pause], a
+	ld [wTimer_pause], a
 	ret
-Counting_pause::
+CountingPause::
 	ld a, 1
-	ld [Timer_pause], a
+	ld [wTimer_pause], a
 	ret
-Counting_reset::
+CountingReset::
 	xor a
-	ld [Timer_done], a
+	ld [wTimer_done], a
 	ret
 
 SECTION "CountingUpdate", ROM0
-Counting_update::
+CountingUpdate::
 	; should we count?
-	ld a, [Timer_shouldCount]
+	ld a, [wTimer_shouldCount]
 	and 1
 	jr z, .doneCounting
 	; are we paused?
-	ld a, [Timer_pause]
+	ld a, [wTimer_pause]
 	cp 1
 	jr z, .stopCounting
 ;.incrementMilliseconds
-	;ld a, [Timer_ms]
+	;ld a, [wTimer_ms]
 	;inc a
-	;ld [Timer_ms], a
+	;ld [wTimer_ms], a
 	;cp 60
 	;jr z, .incrementSeconds
 	;jr .stopCounting
 .incrementSeconds
 	;xor a
-	;ld [Timer_ms], a
-	ld a, [Timer_s]
+	;ld [wTimer_ms], a
+	ld a, [wTimer_s]
 	inc a
-	ld [Timer_s], a
+	ld [wTimer_s], a
 	cp 60
 	jr z, .incrementMinutes
 	jr .stopCounting
 .incrementMinutes
 	xor a
-	ld [Timer_s], a
-	ld a, [Timer_m]
+	ld [wTimer_s], a
+	ld a, [wTimer_m]
 	inc a
-	ld [Timer_m], a
+	ld [wTimer_m], a
 	ld l, a
 	; check to see if we have reached our goal
-	ld a, [Timer_goal]
+	ld a, [wTimer_goal]
 	sub a, l
 	jr z, .checkIfDone
 .stopCounting
   ret
 .checkIfDone
-	ld a, [Timer_goal]
+	ld a, [wTimer_goal]
 	ld b, a
-	ld a, [Timer_m]
+	ld a, [wTimer_m]
 	cp b
 	jr z, .doneCounting
 	ret
 .doneCounting
 	xor a
-	ld [Timer_shouldCount], a
+	ld [wTimer_shouldCount], a
 	ld a, 1
-	ld [Timer_done], a
+	ld [wTimer_done], a
 	ret

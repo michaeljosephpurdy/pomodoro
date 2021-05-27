@@ -1,7 +1,10 @@
-SECTION "Text_variables", WRAM0
+SECTION "Text Variables", WRAM0
+wTextPosition: DS 1
 
-SECTION "Text_init", ROM0
-Text_init::
+SECTION "TextInit", ROM0
+TextInit::
+  ld a, 250
+  ld [wTextPosition], a
 .copyFont
   ld hl, $9000 ; 9000 is where the background starts
   ld de, FontTiles
@@ -16,21 +19,33 @@ Text_init::
   jr nz, .copyFontLoop
   ret
 
-SECTION "Text_draw", ROM0
-Text_draw::
-;.copyFont
-;  ld hl, $9000 ; 9000 is where the background starts
-;  ld de, FontTiles
-;  ld bc, FontTilesEnd - FontTiles
-;.copyFontLoop
-;  ld a, [de]
+SECTION "TextUpdate", ROM0
+TextUpdate::
+.updatePosition
+  ld a, [wTextPosition]
+  inc a
+  ld [wTextPosition], a
+;.updateText
+;  ld hl, $9800
+;  ld a, HIGH(wTime_left_m)
 ;  ld [hli], a
-;  inc de
-;  dec bc
-;  ld a, b
-;  or c
-;  jr nz, .copyFontLoop
+;  ld a, LOW(wTime_left_m)
+;  ld [hli], a
+;  ld a, "m"
+;  ld [hli], a
+;  ld a, " "
+;  ld [hli], a
+;  ld a, HIGH(wTime_left_s)
+;  ld [hli], a
+;  ld a, LOW(wTime_left_s)
+;  ld [hli], a
+;  ld a, "s"
+;  ld [hli], a
+  ret
 
+
+SECTION "TextDraw", ROM0
+TextDraw::
 .copyString
   ld hl, $9800 ; background map
   ld de, HelloWorldString
@@ -40,6 +55,9 @@ Text_draw::
   inc de
   and a
   jr nz, .copyStringLoop
+.positionText
+  ld a, [wTextPosition]
+  ld [$FF43], a ; $FF43 is background scroll x
   ret
 
 SECTION "Text_font", ROM0
@@ -49,4 +67,5 @@ FontTilesEnd:
 
 SECTION "Hello world string", ROM0
 HelloWorldString:
-  db "hello world", 0
+  db "Pomodoro", 0
+HelloWorldStringEnd:
