@@ -11,14 +11,16 @@ Main:
 
 SECTION "Main Init", ROM0
 Main_init:
+	call DMACopyToHRAM 
+	call TextCopyToVRAM
+	call TomatoCopyToVRAM
+
 	call CountingInit
 	call InputInit
 	call TomatoInit
 	call TextInit
-	call ShadowOAMClear
-	call CopyDMARoutine
-	call TextDraw
-	call TomatoDraw
+
+	call DMAClearShadowOAM 
 	call ScreenResetScrollRegisters
 	call ScreenSetPallette
 	;timer

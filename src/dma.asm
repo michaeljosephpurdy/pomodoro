@@ -16,7 +16,7 @@ DMAInit::
   ret
 
 SECTION "DMA routine", ROM0
-CopyDMARoutine:
+DMACopyToHRAM::
   ld  hl, DMARoutine
   ld  b, DMARoutineEnd - DMARoutine ; Number of bytes to copy
   ld  c, LOW(hOAMDMA) ; Low byte of the destination address
@@ -37,7 +37,7 @@ DMARoutine:
   ret
 DMARoutineEnd:
 
-ShadowOAMClear::
+DMAClearShadowOAM::
   ld de, wShadowOAMEnd
   ld hl, wShadowOAM
 .loop

@@ -29,7 +29,7 @@ VBlankHandler:
 	ld  a, HIGH(wShadowOAM)
   call hOAMDMA
   call TextUpdate
-  call TextDraw
+  call TextCopyToVRAM 
   pop hl
   pop de
   pop bc

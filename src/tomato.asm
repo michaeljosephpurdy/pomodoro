@@ -29,7 +29,7 @@ TomatoMoveY::
   ret
 
 SECTION "Tomato Draw", ROM0
-TomatoDraw::
+TomatoCopyToVRAM::
   ; we need to copy the data from ROM into VRAM
   ld hl, TomatoSprite ; label where the sprite data exists
   ; get the location _not_ the value

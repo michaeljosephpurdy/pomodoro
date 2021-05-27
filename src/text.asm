@@ -1,7 +1,7 @@
 SECTION "Text Variables", WRAM0
 wTextPosition: DS 1
 
-SECTION "TextInit", ROM0
+SECTION "Text Init", ROM0
 TextInit::
   ld a, 250
   ld [wTextPosition], a
@@ -19,7 +19,7 @@ TextInit::
   jr nz, .copyFontLoop
   ret
 
-SECTION "TextUpdate", ROM0
+SECTION "Text Update", ROM0
 TextUpdate::
 .updatePosition
   ld a, [wTextPosition]
@@ -44,8 +44,8 @@ TextUpdate::
   ret
 
 
-SECTION "TextDraw", ROM0
-TextDraw::
+SECTION "Text Draw", ROM0
+TextCopyToVRAM::
 .copyString
   ld hl, $9800 ; background map
   ld de, HelloWorldString
