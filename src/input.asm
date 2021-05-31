@@ -1,9 +1,9 @@
 SECTION "wInput_wram", WRAM0
 wSomeLocation: DS 1
-wInput_lastInput: DS 1
-wInput_buttonDown: DS 1
-wInput_currentDirection: DS 1
-wInput_lastDirection: DS 1
+wInputAWasPressed:: DS 1
+wInputBWasPressed:: DS 1
+wInputAIsDown:: DS 1
+wInputBIsDown:: DS 1
 wInput_currentButtonDown: DS 1
 wInput_lastButtonDown: DS 1
 
@@ -15,9 +15,13 @@ InputInit::
   ret
 InputReset:
   xor a
-  ld [wInput_buttonDown], a
+  ld [wInputAWasPressed], a
+  ld [wInputAIsDown], a
+  ld [wInputBWasPressed], a
+  ld [wInputBIsDown], a
   ret
 InputUpdate::
+  call InputReset
   ; FF00 is joypad read/write
   ; if you want to get the A button, you need to write to bit 4
   ; to tell it that we want 'action' buttons and not 'directional' buttons
@@ -32,11 +36,11 @@ InputUpdate::
   ld b, a
   ld a, [wInput_lastButtonDown]
   cp b
-  jr z, .done
+  jr z, .checkPressedButtonsEnd
 
   ld a, [wInput_currentButtonDown]
   ld [wInput_lastButtonDown], a
-
+.checkPressedButtons
   ; A button
   xor $DE
   jr z, .aPressed
@@ -47,17 +51,35 @@ InputUpdate::
   jr z, .bPressed
   ret
 .aPressed
-  call TomatoMoveX
-  call Counting_toggle
   ld a, 1
-  ld [wInput_buttonDown], a
-  jr .done
+  ld [wInputAWasPressed], a
+	ld a, %0100 ; enable timer
+	ld [$FF07], a
+  jr .checkPressedButtonsEnd
 .bPressed
-  call TomatoMoveY
   ld a, 1
-  ld [wInput_buttonDown], a
-  jr .done
-.done
+  ld [wInputBWasPressed], a
+	ld a, %0000 ; enable timer
+	ld [$FF07], a
+  jr .checkPressedButtonsEnd
+.checkPressedButtonsEnd
+.checkDownButtons
+  ld a, [wInput_currentButtonDown]
+  xor $DE
+  jr nz, .aDownEnd
+.aDown
+  ld a, 1
+  ld [wInputAIsDown], a
+.aDownEnd
+  ld a, [wInput_currentButtonDown]
+  ;b button
+  xor $DD
+  jr nz, .bDownEnd
+.bDown
+  ld a, 1
+  ld [wInputBIsDown], a
+.bDownEnd
+.checkDownButtonsEnd
   ret
   
 .readInput

@@ -1,4 +1,4 @@
-SECTION "InterruptsInit", ROM0
+SECTION "Interrupts Init", ROM0
 InterruptsInit::
 	; https://gbdev.io/pandocs/Interrupts.html#ffff---ie---interrupt-enable-rw
 	; Interrupt flag
@@ -11,12 +11,17 @@ InterruptsInit::
 	ld [$FFFF], a ; $FFFF 
 	xor a
 	ld [$FF0F], a
+	;timer
+	ld a, $C0
+	ld [$FF06], a
+	ld a, %0100 ; enable timer
+	ld [$FF07], a
 	reti ; enable interrupts
 
-SECTION "interrupts_vblank", ROM0[$0040]
+SECTION "Interrupts VBlank", ROM0[$0040]
 	jp VBlankHandler
 
-SECTION "interrupts_vblankHandler", ROM0
+SECTION "Interrupts VBlank Handler", ROM0
 VBlankHandler:
   push af
   push bc
@@ -28,21 +33,21 @@ VBlankHandler:
  	ld [$FF48], a ; $FF48 - Object palette 
 	ld  a, HIGH(wShadowOAM)
   call hOAMDMA
-  call TextUpdate
   call TextCopyToVRAM 
+  call TextUpdate
   pop hl
   pop de
   pop bc
   pop af
   reti
 
-SECTION "interrupts_lcd", ROM0[$0048]
+SECTION "Interrupts LCD", ROM0[$0048]
   ret
   
-SECTION "interrupts_timer", ROM0[$0050]
+SECTION "Interrupts Timer", ROM0[$0050]
   jp TimerHandler
 
-SECTION "interrupts_timerHandler", ROM0
+SECTION "Interrupts Timer Handler", ROM0
 TimerHandler:
   push af
   push bc
@@ -55,8 +60,8 @@ TimerHandler:
   pop af
   reti
   
-SECTION "interrupts_serial", ROM0[$0058]
+SECTION "Interrupts Serial", ROM0[$0058]
   ret
   
-SECTION "interrupts_joypad", ROM0[$0060]
+SECTION "Interrupts Joypad", ROM0[$0060]
   ret

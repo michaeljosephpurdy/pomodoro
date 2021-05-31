@@ -23,17 +23,11 @@ Main_init:
 	call DMAClearShadowOAM 
 	call ScreenResetScrollRegisters
 	call ScreenSetPallette
-	;timer
-	ld a, $0
-	ld [$FF06], a
-	ld a, %0100 ; enable timer @ cpu clock / 16 = something
-	ld [$FF07], a
 	call InterruptsInit
 	ret
 
 SECTION "Main Update", ROM0
 Main_update:
 	call InputUpdate
-	call TextUpdate
 	call TomatoUpdate
 	ret 

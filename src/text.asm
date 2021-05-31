@@ -25,22 +25,33 @@ TextUpdate::
   ld a, [wTextPosition]
   inc a
   ld [wTextPosition], a
-;.updateText
-;  ld hl, $9800
-;  ld a, HIGH(wTime_left_m)
-;  ld [hli], a
-;  ld a, LOW(wTime_left_m)
-;  ld [hli], a
-;  ld a, "m"
-;  ld [hli], a
-;  ld a, " "
-;  ld [hli], a
-;  ld a, HIGH(wTime_left_s)
-;  ld [hli], a
-;  ld a, LOW(wTime_left_s)
-;  ld [hli], a
-;  ld a, "s"
-;  ld [hli], a
+.updateMinutes
+  ld hl, $9800
+  ld a, [wTime_left_m]
+  ld [wMathInput], a
+  call MathSplitDigits
+  ld a, [wMathOutputTensPlace]
+  add 48
+  ld [hli], a
+  ld a, [wMathOutputOnesPlace]
+  add 47
+  ld [hli], a
+  ld a, "m"
+  ld [hli], a
+  ld a, " "
+  ld [hli], a
+.updateSeconds
+  ld a, [wTime_left_s]
+  ld [wMathInput], a
+  call MathSplitDigits
+  ld a, [wMathOutputTensPlace]
+  add 48
+  ld [hli], a
+  ld a, [wMathOutputOnesPlace]
+  add 47
+  ld [hli], a
+  ld a, "s"
+  ld [hli], a
   ret
 
 
@@ -55,9 +66,9 @@ TextCopyToVRAM::
   inc de
   and a
   jr nz, .copyStringLoop
-.positionText
-  ld a, [wTextPosition]
-  ld [$FF43], a ; $FF43 is background scroll x
+;.positionText
+  ;ld a, [wTextPosition]
+  ;ld [$FF43], a ; $FF43 is background scroll x
   ret
 
 SECTION "Text_font", ROM0
@@ -67,5 +78,5 @@ FontTilesEnd:
 
 SECTION "Hello world string", ROM0
 HelloWorldString:
-  db "Pomodoro", 0
+  db "00m 00s", 0
 HelloWorldStringEnd:

@@ -12,7 +12,7 @@ SECTION "Tomato Init", ROM0
 TomatoInit::
   ld a, 8
   ld [wTomato_x], a
-  ld a, 16
+  ld a, 36
   ld [wTomato_y], a
   ret
 
@@ -47,6 +47,23 @@ TomatoCopyToVRAM::
 
 SECTION "Tomato Update", ROM0
 TomatoUpdate::
+.handleControls:
+.xControls
+  ld a, [wInputAIsDown]
+  cp 1
+  jr nz, .xControlsEnd
+  ld a, [wTomato_x]
+  inc a
+  ld [wTomato_x], a
+.xControlsEnd
+.yControls
+  ld a, [wInputBIsDown]
+  cp 1
+  jr nz, .yControlsEnd
+  ld a, [wTomato_y]
+  inc a
+  ld [wTomato_y], a
+.yControlsEnd
  	ld a, %11100100
  	ld [$FF48], a ; $FF48 - Object palette 
 .topLeft
